@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\DTO\PaymentData;
+use App\Entity\Lot;
 use App\Entity\Payment;
 use DateInterval;
 use DateTime;
 use App\Repository\LotRepository;
+use App\Repository\PaymentRepository;
 
 class PaymentService
 {
@@ -17,11 +19,21 @@ class PaymentService
         $today = new DateTime('NOW');
         $expirationDate = self::setExpirationDate($today);
         $status = 'pending';
-        $value = self::calculateTicketAmount($paymentData);
+
+        $lotRepository = new LotRepository();
+        $lot = $lotRepository->getLotById($paymentData->getLot());
+
+        $value = self::calculateTicketAmount($paymentData, $lot);
+        $ticketsQuantity = (int) $paymentData->getTickets();
+        
+        if (!self::isQuantityAvailable($ticketsQuantity, $lot)) {
+            throw new \Exception('Cannot buy this quantity of tickets');
+        }
 
         $payment = Payment::createFromPaymentData($value, $paymentData, $status, $today->format('Y-m-d'), $expirationDate->format('Y-m-d'));
         
-        //savePayment
+        (new PaymentRepository())->savePayment($payment);
+        self::updateLotQuantity($ticketsQuantity, $lot, $lotRepository);
 
         return $payment;
     }
@@ -33,11 +45,20 @@ class PaymentService
         return $expirationDate;
     }
 
-    private static function calculateTicketAmount(PaymentData $paymentData)
+    private static function calculateTicketAmount(PaymentData $paymentData, Lot $lot)
     {
-        $lot = (new LotRepository())->getLotById($paymentData->getLot());
         $ticketValue = (float) $lot->getValue();
         
         return $ticketValue *  $paymentData->getTickets();
     }
+
+    private static function isQuantityAvailable(int $ticketQuantity, Lot $lot): bool
+    {
+        return $ticketQuantity <= (int) $lot->getQuantity();
+    }
+
+    private static function updateLotQuantity(int $ticketsQuantity, Lot $lot, LotRepository $lotRepository): void
+    {
+        $lotRepository->reserveTickets($lot, $ticketsQuantity);
+    } 
 }

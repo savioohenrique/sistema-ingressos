@@ -21,10 +21,17 @@ class CreatePaymentController implements RequestHandlerInterface
             return new Response(422, [], $e->getMessage());
         }
 
-        $response = PaymentService::createPayment($paymentData);
-        echo "<pre>";
-        var_dump($response);
+        try {
+            $responseMessage = PaymentService::createPayment($paymentData);
+        } catch (\Exception $e) {
+            $message = "Error: {$e->getMessage()}";
+            return new Response(400, [], $message);
+        }
 
-        return new Response(200, [], 'Message received');
+        // $response = PaymentService::createPayment($paymentData);
+        // echo "<pre>";
+        // var_dump($response);
+
+        return new Response(201, [], $responseMessage);
     }
 }

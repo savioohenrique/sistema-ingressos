@@ -19,4 +19,11 @@ class LotRepository
     {
         return $this->entityManager->find(Lot::class, $lotId);
     }
+
+    public function reserveTickets(Lot $lot, int $ticketQuantity)
+    {
+        // $lot = $this->getLotById($lotId);
+        $lot->reserveTickets($ticketQuantity);
+        $this->entityManager->flush();
+    }
 }

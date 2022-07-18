@@ -17,6 +17,7 @@ class PaymentRepository
 
     public function savePayment(Payment $payment)
     {
-        return $this->entityManager->persist($payment);
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush();
     }
 }

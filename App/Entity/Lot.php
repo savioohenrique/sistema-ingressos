@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -96,5 +95,13 @@ class Lot
     
     public function getFinishDate(){
         return $this->finish_date;
-    }   
+    }
+
+    public function reserveTickets(int $ticketsQuantity): void 
+    {
+        if ($ticketsQuantity <= $this->quantity) {
+            $this->quantity -= $ticketsQuantity;
+            $this->reserved += $ticketsQuantity;
+        }
+    }
 }

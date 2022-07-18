@@ -5,45 +5,80 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\DTO\PaymentData;
-use DateTime;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="Payment")
+ */
 class Payment
 {
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="string")
+     */
     private string $id;
+    /**
+     * @ORM\Column(type="string")
+     */
     private float $value;
-    private string $clientId;
-    private string $customerId;
-    private string $lotId;
+    /**
+     * @ORM\Column(type="string")
+     */
+    private string $client_id;
+    /**
+     * @ORM\Column(type="string")
+     */
+    private string $customer_id;
+    /**
+     * @ORM\Column(type="string")
+     */
+    private string $lot_id;
+    /**
+     * @ORM\Column(type="integer")
+     */
     private int $tickets;
-    private string $eventId;
+    /**
+     * @ORM\Column(type="string")
+     */
+    private string $event_id;
+    /**
+     * @ORM\Column(type="string")
+     */
     private string $status;
+    /**
+     * @ORM\Column(type="string")
+     */
     private string $date;
-    private string $expirationDate;
+    /**
+     * @ORM\Column(type="string")
+     */
+    private string $expiration_date;
     
     public function __construct(
         $value,
-        string $clientId,
-        string $customerId,
-        string $eventId,
-        string $lotId,
+        string $client_id,
+        string $customer_id,
+        string $event_id,
+        string $lot_id,
         int $tickets,
         string $status,
         string $date,
-        string $expirationDate
+        string $expiration_date
     ) {
         $this->id = uniqid('P', true);
-        $this->client = $clientId;
-        $this->customerId = $customerId;
         $this->value = $value;
-        $this->lot = $lotId;
+        $this->client_id = $client_id;
+        $this->customer_id = $customer_id;
+        $this->event_id = $event_id;
+        $this->lot_id = $lot_id;
         $this->tickets = $tickets;
-        $this->eventId = $eventId;
         $this->status = $status;
         $this->date = $date;
-        $this->expirationDate = $expirationDate;
+        $this->expiration_date = $expiration_date;
     }
 
-    public static function createFromPaymentData($value, PaymentData $paymentData, string $status, string $date, string $expirationDate)
+    public static function createFromPaymentData($value, PaymentData $paymentData, string $status, string $date, string $expiration_date)
     {
         return new self(
             $value,
@@ -54,7 +89,7 @@ class Payment
             $paymentData->getTickets(),
             $status,
             $date,
-            $expirationDate
+            $expiration_date
         );
     }
 
@@ -63,24 +98,24 @@ class Payment
         return $this->id;
     }
 
-    public function getValue(): string
+    public function getValue()
     {
         return $this->value;
     }
 
-    public function getClient(): string
+    public function getClientId(): string
     {
-        return $this->clientId;
+        return $this->client_id;
     }
 
-    public function getCustomer(): string
+    public function getCustomerId(): string
     {
         return $this->customerId;
     }
 
     public function getLot(): string
     {
-        return $this->lotId;
+        return $this->lot_id;
     }
 
     public function getTickets(): int
@@ -90,7 +125,7 @@ class Payment
 
     public function getEventId(): string
     {
-        return $this->eventId;
+        return $this->event_id;
     }
 
     public function getStatus(): string
@@ -98,13 +133,13 @@ class Payment
         return $this->status;
     }
 
-    public function getDate(): DateTime
+    public function getDate(): string
     {
         return $this->date;
     }
     
-    public function getexpirationDate(): DateTime
+    public function getexpirationDate(): string
     {
-        return $this->expirationDate;
+        return $this->expiration_date;
     }   
 }
