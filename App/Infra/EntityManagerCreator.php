@@ -11,6 +11,7 @@ class EntityManagerCreator
     public function getEntityManager(): EntityManagerInterface
     {
         $paths = [__DIR__ . '/../Entity'];
+        
         $isDevMode = false;
 
         $dbParams = array(
