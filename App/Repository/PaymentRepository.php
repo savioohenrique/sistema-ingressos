@@ -29,4 +29,9 @@ class PaymentRepository
     {
         return $this->entityRepository->find($paymentId);
     }
+
+    public function getPaymentByStatus(string $status): ?array
+    {
+        return $this->entityRepository->findBy(['status' => $status]);
+    }
 }
