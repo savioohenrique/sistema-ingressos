@@ -21,7 +21,7 @@ class Payment
     /**
      * @ORM\Column(type="string")
      */
-    private float $value;
+    private string $value;
     /**
      * @ORM\Column(type="string")
      */
@@ -110,7 +110,7 @@ class Payment
 
     public function getCustomerId(): string
     {
-        return $this->customerId;
+        return $this->customer_id;
     }
 
     public function getLot(): string

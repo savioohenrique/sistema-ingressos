@@ -2,8 +2,14 @@
 
 use App\Controllers\ClientController;
 use App\Controllers\CreatePaymentController;
+use App\Controllers\GetPaymentController;
 
 return [
-    '/client' => ClientController::class,
-    '/payment' => CreatePaymentController::class,
+    'GET' => [
+        '/payment' => GetPaymentController::class,
+    ],
+    'POST' => [
+        '/client' => ClientController::class,
+        '/payment' => CreatePaymentController::class,
+    ]
 ];
