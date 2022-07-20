@@ -4,12 +4,13 @@ namespace App\Repository;
 
 use App\Entity\Payment;
 use App\Infra\EntityManagerCreator;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
 class PaymentRepository
 {
-    private EntityManagerInterface $entityManager;
+    private EntityManager $entityManager;
     private EntityRepository $entityRepository;
 
     public function __construct()
@@ -33,5 +34,14 @@ class PaymentRepository
     public function getPaymentByStatus(string $status): ?array
     {
         return $this->entityRepository->findBy(['status' => $status]);
+    }
+
+    public function cancelPayment(string $paymentId): Payment
+    {
+        $payment = $this->entityManager->find(Payment::class, $paymentId);
+        $payment->setStatus('canceled');
+        $this->entityManager->flush();
+
+        return $payment;
     }
 }

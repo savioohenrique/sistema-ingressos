@@ -104,4 +104,20 @@ class Lot
             $this->reserved += $ticketsQuantity;
         }
     }
+
+    public function cancelTickets(int $ticketsQuantity): void 
+    {
+        if ($ticketsQuantity <= $this->quantity) {
+            $this->reserved -= $ticketsQuantity;
+            $this->quantity += $ticketsQuantity;
+        }
+    }
+
+    public function confirmTickets(int $ticketsQuantity): void 
+    {
+        if ($ticketsQuantity <= $this->quantity) {
+            $this->reserved -= $ticketsQuantity;
+            $this->purchased += $ticketsQuantity;
+        }
+    }
 }

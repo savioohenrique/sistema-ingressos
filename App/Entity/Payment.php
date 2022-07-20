@@ -141,5 +141,10 @@ class Payment
     public function getexpirationDate(): string
     {
         return $this->expiration_date;
-    }   
+    }
+
+    public function setStatus(string $status): void
+    {
+        $this->status = $status;
+    }
 }

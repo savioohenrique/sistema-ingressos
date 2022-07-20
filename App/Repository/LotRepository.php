@@ -29,4 +29,16 @@ class LotRepository
         $lot->reserveTickets($ticketQuantity);
         $this->entityManager->flush();
     }
+
+    public function cancelTickets(Lot $lot, int $ticketQuantity)
+    {
+        $lot->cancelTickets($ticketQuantity);
+        $this->entityManager->flush();
+    }
+
+    public function confirmTickets(Lot $lot, int $ticketQuantity)
+    {
+        $lot->confirmTickets($ticketQuantity);
+        $this->entityManager->flush();
+    }
 }

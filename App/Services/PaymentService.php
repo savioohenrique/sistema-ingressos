@@ -21,7 +21,7 @@ class PaymentService
         $this->paymentRepository = new PaymentRepository();
     }
 
-    public function createPayment(PaymentData $paymentData)
+    public function createPayment(PaymentData $paymentData): string
     {
         $today = new DateTime('NOW');
         $expirationDate = $this->setExpirationDate($today);
@@ -48,7 +48,7 @@ class PaymentService
         return $this->buildSucessfulResponse($payment);
     }
 
-    public function getPayment(string $paymentId)
+    public function getPayment(string $paymentId): string
     {
         $payment = $this->paymentRepository->findPaymentById($paymentId);
         if (is_null($payment)) {
@@ -57,6 +57,38 @@ class PaymentService
 
         return $this->buildSucessfulResponse($payment);
     }
+
+    public function cancelPayment(Payment $payment): Payment
+    {
+        $lotRepository = new LotRepository();
+        $lot = $lotRepository->getLotById($payment->getLot());
+        if (is_null($lot)) {
+            throw new \Exception('Invalid lot of tickets');
+        }
+
+        $ticketsQuantity = (int) $payment->getTickets();
+        
+        $canceledPayment = $this->paymentRepository->cancelPayment($payment->getId());
+        $this->cancelTickets($ticketsQuantity, $lot, $lotRepository);
+
+        return $canceledPayment;
+    }
+
+    public function queryPayment(Payment $payment): Payment
+    {
+        $lotRepository = new LotRepository();
+        $lot = $lotRepository->getLotById($payment->getLot());
+        if (is_null($lot)) {
+            throw new \Exception('Invalid lot of tickets');
+        }
+
+        $ticketsQuantity = (int) $payment->getTickets();
+        
+        $canceledPayment = $this->paymentRepository->cancelPayment($payment->getId());
+        $this->confirmTickets($ticketsQuantity, $lot, $lotRepository);
+
+        return $canceledPayment;
+    } 
 
     private function setExpirationDate(Datetime $date): DateTime 
     {
@@ -81,7 +113,17 @@ class PaymentService
     private function reserveTickets(int $ticketsQuantity, Lot $lot, LotRepository $lotRepository): void
     {
         $lotRepository->reserveTickets($lot, $ticketsQuantity);
-    } 
+    }
+
+    private function cancelTickets(int $ticketsQuantity, Lot $lot, LotRepository $lotRepository): void
+    {
+        $lotRepository->cancelTickets($lot, $ticketsQuantity);
+    }
+
+    private function confirmTickets(int $ticketsQuantity, Lot $lot, LotRepository $lotRepository): void
+    {
+        $lotRepository->confirmTickets($lot, $ticketsQuantity);
+    }
 
     private function buildSucessfulResponse(Payment $payment)
     {
