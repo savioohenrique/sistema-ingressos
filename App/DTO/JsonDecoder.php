@@ -18,8 +18,6 @@ class JsonDecoder
         $decodedResonseBody = json_decode($this->responseBody, true);
         $decodedError = json_last_error() !== JSON_ERROR_NONE;
 
-        // echo "ResponseBody: {$this->responseBody} <br>";
-
         if ($decodedError) {
             throw new JsonDecoderException(json_last_error_msg());
         }

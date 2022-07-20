@@ -138,7 +138,7 @@ class Payment
         return $this->date;
     }
     
-    public function getexpirationDate(): string
+    public function getExpirationDate(): string
     {
         return $this->expiration_date;
     }

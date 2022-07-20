@@ -44,4 +44,13 @@ class PaymentRepository
 
         return $payment;
     }
+
+    public function confirmPayment(string $paymentId): Payment
+    {
+        $payment = $this->entityManager->find(Payment::class, $paymentId);
+        $payment->setStatus('confirmed');
+        $this->entityManager->flush();
+
+        return $payment;
+    }
 }

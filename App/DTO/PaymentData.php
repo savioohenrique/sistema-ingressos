@@ -14,7 +14,6 @@ class PaymentData
 	}
 
     public static function fromHttpRequest(RequestInterface $request): self {
-        // echo "PaymentData: " . $request->getBody(). "<br>";
 		$jsonDecoder = new JsonDecoder($request->getBody());
 		return new self($jsonDecoder->decodeJsonToArray());
 	}

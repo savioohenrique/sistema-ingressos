@@ -41,6 +41,8 @@ class PaymentService
         }
 
         $payment = Payment::createFromPaymentData($value, $paymentData, $status, $today->format('Y-m-d'), $expirationDate->format('Y-m-d'));
+
+        $response = $this->sendCreatePaymentRequest($payment);
         
         $this->paymentRepository->savePayment($payment);
         $this->reserveTickets($ticketsQuantity, $lot, $lotRepository);
@@ -78,17 +80,59 @@ class PaymentService
     {
         $lotRepository = new LotRepository();
         $lot = $lotRepository->getLotById($payment->getLot());
-        if (is_null($lot)) {
-            throw new \Exception('Invalid lot of tickets');
+        $ticketsQuantity = (int) $payment->getTickets();
+
+        $response = $this->sendQueryRequest($payment->getId());
+        $arrayResponse = json_decode($response, true);
+        
+        if (is_array($arrayResponse) && array_key_exists('payment_status', $arrayResponse) && $this->validateConfirmedPaymentStatus($arrayResponse['payment_status'])) {
+            $payment = $this->paymentRepository->confirmPayment($payment->getId());
+            $this->confirmTickets($ticketsQuantity, $lot, $lotRepository);
         }
 
-        $ticketsQuantity = (int) $payment->getTickets();
-        
-        $canceledPayment = $this->paymentRepository->cancelPayment($payment->getId());
-        $this->confirmTickets($ticketsQuantity, $lot, $lotRepository);
+        return $payment;
+    }
 
-        return $canceledPayment;
-    } 
+    private function sendCreatePaymentRequest(Payment $payment): string|bool
+    {
+        $url = 'http://localhost:8081/public/create-payment';
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+        $data = <<<DATA
+        {
+            "payment_id": "{$payment->getId()}",
+            "payment_amount": "{$payment->getValue()}",
+            "customer_id": "{$payment->getCustomerId()}",
+            "client_id": "{$payment->getClientId()}",
+            "payment_date": "{$payment->getDate()}",
+            "payment_expiration_date": "{$payment->getExpirationDate()}"
+        }
+        DATA;
+
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        return $response;
+    }
+
+    private function sendQueryRequest(string $paymentId)
+    {
+        $url = 'http://localhost:8081/public/query-payment?id=' . $paymentId;
+        $response = file_get_contents($url);
+
+        return $response;
+    }
+
+    private function validateConfirmedPaymentStatus(string $paymentStatus): bool
+    {
+        return $paymentStatus === 'confirmed';
+    }
 
     private function setExpirationDate(Datetime $date): DateTime 
     {
@@ -135,7 +179,7 @@ class PaymentService
     "event_id": "{$payment->getEventId()}",
     "tickets": "{$payment->getTickets()}",
     "payment_status": "{$payment->getStatus()}",
-    "payment_expiration_date": "{$payment->getexpirationDate()}"
+    "payment_expiration_date": "{$payment->getExpirationDate()}"
 }
 JSON;
     }

@@ -15,12 +15,12 @@ $payments = $paymentRepository->getPaymentByStatus($status);
 $now = new \DateTime('now');
 $today = $now->format('Y-m-d');
 
+
 $paymentService = new PaymentService();
 
 /** @var Payment $payment */
 foreach ($payments as $key => $payment) {
-    // Verificar expiration date 
-    if (isPaymentExpired($payment->getexpirationDate(), $today)) {
+    if (isPaymentExpired($payment->getExpirationDate(), $today)) {
         $payment = $paymentService->cancelPayment($payment);
         echo "#### Cancel Method #### " . PHP_EOL;
         echo "Payment: " . $payment->getId() . PHP_EOL;

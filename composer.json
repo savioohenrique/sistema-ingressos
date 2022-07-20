@@ -19,6 +19,7 @@
         "doctrine/orm": "^2.12",
         "php-di/php-di": "*",
         "symfony/cache": "^6.1",
-        "doctrine/annotations": "^1.13"
+        "doctrine/annotations": "^1.13",
+        "symfony/http-client": "^6.1"
     }
 }
